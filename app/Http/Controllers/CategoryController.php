@@ -24,28 +24,19 @@ class CategoryController extends Controller
         return redirect()->back()->with('success', 'Added iniative successfuly');
     }
 
-    public function destroy($id)
-    {
-        $cat = Category::findOrFail($id);
-        $cat->delete();
-
-        return redirect()->back()->with('success', 'Deleted Successfully');
-    }
+    
 
     public function update(Request $request, $id)
-    {
-        $category = Category::findOrFail($id);
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+    ]);
 
-        $data = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
-        ]);
+    $category = Category::findOrFail($id);
+    $category->name = $request->name;
+    $category->save();
 
-        $category->update($data);
+    return redirect('/categories')->with('success', 'Category updated successfully!');
+}
 
-        if ($request->wantsJson() || $request->ajax()) {
-            return response()->json(['success' => true, 'category' => $category]);
-        }
-
-        return redirect()->back()->with('success', 'edited successfully');
-    }
 }
